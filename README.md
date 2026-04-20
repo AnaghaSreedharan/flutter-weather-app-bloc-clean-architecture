@@ -1,16 +1,43 @@
-# interview
+# 🌤️ Weather App
 
-A new Flutter project.
+A Flutter weather application demonstrating Clean Architecture and BLoC pattern.
 
-## Getting Started
+## 📐 Architecture
 
-This project is a starting point for a Flutter application.
+- **Presentation Layer** — BLoC (Events, States, BlocBuilder)
+- **Domain Layer** — Entities, Repository Interface, Use Cases
+- **Data Layer** — Repository Implementation, Remote Data Source
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Search weather by city name
+- Real-time temperature and description
+- Error handling for invalid cities
+- Unit tested with mocktail
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Tech Stack
+
+- Flutter & Dart
+- BLoC for state management
+- Clean Architecture
+- REST API (OpenWeatherMap)
+- Unit Testing (flutter_test, mocktail, bloc_test)
+
+## 🧪 Running Tests
+
+```bash
+flutter test
+```
+
+## 📁 Folder Structure
+
+```
+lib/
+├── core/
+├── features/
+│   └── weather/
+│       ├── data/
+│       ├── domain/
+│       └── presentation/
+└── main.dart
+```

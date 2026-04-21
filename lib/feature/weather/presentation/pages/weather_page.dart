@@ -59,7 +59,16 @@ class _WeatherPageState extends State<WeatherPage> {
                   return const CircularProgressIndicator();
                 }
                 if (state is WeatherLoaded) {
-                  return _WeatherDisplay(weather: state.weather);
+                  return Column(                                    // 👈 only this block changed
+                    children: [
+                      _WeatherDisplay(weather: state.weather),
+                      const SizedBox(height: 24),
+                      _SearchHistory(history: state.searchHistory),
+                    ],
+                  );
+                }
+                if (state is SearchHistoryLoaded) {
+                  return _SearchHistory(history: state.history);
                 }
                 if (state is WeatherError) {
                   return Text(
@@ -73,6 +82,40 @@ class _WeatherPageState extends State<WeatherPage> {
           ],
         ),
       ),
+    );
+  }
+}
+class _SearchHistory extends StatelessWidget {
+  final List<String> history;
+
+  const _SearchHistory({required this.history});
+
+  @override
+  Widget build(BuildContext context) {
+    if (history.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Recent Searches',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...history.map(
+              (city) => ListTile(
+            leading: const Icon(Icons.history),
+            title: Text(city),
+            onTap: () {
+              // Tapping history item loads weather directly
+              context.read<WeatherBloc>().add(GetWeatherEvent(city));
+            },
+          ),
+        ),
+      ],
     );
   }
 }

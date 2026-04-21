@@ -13,10 +13,11 @@ class WeatherLoading extends WeatherState {}
 
 class WeatherLoaded extends WeatherState {
   final Weather weather;
-  WeatherLoaded(this.weather);
+  final List<String> searchHistory;
+  WeatherLoaded(this.weather, this.searchHistory,);
 
   @override
-  List<Object> get props => [weather];
+  List<Object> get props => [weather, searchHistory];
 }
 
 class WeatherError extends WeatherState {
@@ -25,4 +26,12 @@ class WeatherError extends WeatherState {
 
   @override
   List<Object> get props => [message];
+}
+
+class SearchHistoryLoaded extends WeatherState {
+  final List<String> history;
+  SearchHistoryLoaded(this.history);
+
+  @override
+  List<Object> get props => [history];
 }

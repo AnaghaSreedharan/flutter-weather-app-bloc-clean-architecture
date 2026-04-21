@@ -3,19 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/feature/weather/data/dataSources/weather_remote_datasource.dart';
 
+import 'feature/weather/data/dataSources/weather_local_datasource.dart';
 import 'feature/weather/data/repositories/weather_repository_impl.dart';
 import 'feature/weather/domain/usecases/get_weather.dart';
 import 'feature/weather/presentation/bloc/weather_bloc.dart';
+import 'feature/weather/presentation/bloc/weather_event.dart';
 import 'feature/weather/presentation/pages/weather_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final client = http.Client();
+  final prefs = await SharedPreferences.getInstance();
   final dataSource = WeatherRemoteDatasourceImpl(client);
-  final repository = WeatherRepositoryImpl(dataSource);
+  final localDataSource = WeatherLocalDataSourceImpl(prefs);
+  final repository = WeatherRepositoryImpl(dataSource,localDataSource);
   final getWeather = GetWeather(repository);
-  final bloc = WeatherBloc(getWeather);
+  final bloc = WeatherBloc(getWeather,repository);
 
-  runApp(BlocProvider(create: (context) => bloc, child: const MyApp()));
+  runApp(BlocProvider(create: (context) => bloc..add(LoadSearchHistoryEvent()), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

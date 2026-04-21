@@ -1,3 +1,4 @@
+![Flutter CI](https://github.com/AnaghaSreedharan/flutter-weather-app-bloc-clean-architecture/actions/workflows/flutter_ci.yml/badge.svg)
 # 🌤️ Weather App
 
 A Flutter weather application demonstrating Clean Architecture and BLoC pattern.

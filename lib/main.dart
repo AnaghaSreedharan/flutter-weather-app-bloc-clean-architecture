@@ -21,7 +21,6 @@ Future<void> main() async {
   final repository = WeatherRepositoryImpl(dataSource,localDataSource);
   final getWeather = GetWeather(repository);
   final bloc = WeatherBloc(getWeather,repository);
-
   runApp(BlocProvider(create: (context) => bloc..add(LoadSearchHistoryEvent()), child: const MyApp()));
 }
 

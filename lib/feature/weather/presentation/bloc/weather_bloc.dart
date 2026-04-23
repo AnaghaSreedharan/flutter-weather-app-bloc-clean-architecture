@@ -17,15 +17,15 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         final weather = await getWeather(event.cityName);
         await repository.saveSearch(event.cityName);
         final history = await repository.getSearchHistory();
-        emit(WeatherLoaded(weather,const [],history));
+        emit(WeatherLoaded(weather: weather,forecast: const [],searchHistory: history));
         // Fetch forecast
         final forecasts = await getForecast(event.cityName);
 
         // Emit again with forecast included
         emit(WeatherLoaded(
-          weather,
-           forecasts,
-          history, // 👈 now forecast is added
+         weather:  weather,
+         forecast:   forecasts,
+         searchHistory:  history,
         ));
       } catch (e) {
         emit(WeatherError(e.toString()));

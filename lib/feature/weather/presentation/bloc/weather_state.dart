@@ -16,7 +16,7 @@ class WeatherLoaded extends WeatherState {
   final Weather weather;
   final List<String> searchHistory;
   final List<Forecast> forecast;
-  WeatherLoaded(this.weather,this.forecast, this.searchHistory,);
+  WeatherLoaded({required this.weather,required this.forecast, required this.searchHistory,});
 
   @override
   List<Object> get props => [weather,forecast, searchHistory];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entities/forecast.dart';
 import '../../domain/entities/weather.dart';
 import '../bloc/weather_bloc.dart';
 import '../bloc/weather_event.dart';
@@ -20,66 +21,76 @@ class _WeatherPageState extends State<WeatherPage> {
       appBar: AppBar(title: const Text('Weather App')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Search Bar
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter city name',
-                      border: OutlineInputBorder(),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Search Bar
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter city name',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Fires event to BLoC
-                    context.read<WeatherBloc>().add(
-                      GetWeatherEvent(_controller.text),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Fires event to BLoC
+                      context.read<WeatherBloc>().add(
+                        GetWeatherEvent(_controller.text),
+                      );
+                    },
+                    child: const Text('Search'),
+                  ),
+                ],
+              ),
+          
+              const SizedBox(height: 32),
+          
+              BlocListener<WeatherBloc, WeatherState>(listener: (context, state){},
+              child: BlocBuilder<WeatherBloc, WeatherState>(
+                builder: (context, state) {
+                  if (state is WeatherInitial) {
+                    return const Text('Search for a city');
+                  }
+                  if (state is WeatherLoading) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (state is WeatherLoaded) {
+                    return Column(                                    // 👈 only this block changed
+                      children: [
+                        _WeatherDisplay(weather: state.weather),
+                        const SizedBox(height: 24),
+                        if (state.forecast.isNotEmpty) ...[
+                          _ForecastDisplay(forecasts: state.forecast),
+                          const SizedBox(height: 24),
+                        ],
+                        _SearchHistory(history: state.searchHistory),
+          
+                      ],
                     );
-                  },
-                  child: const Text('Search'),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 32),
-
-            // BLoC State Handler
-            BlocBuilder<WeatherBloc, WeatherState>(
-              builder: (context, state) {
-                if (state is WeatherInitial) {
-                  return const Text('Search for a city');
-                }
-                if (state is WeatherLoading) {
-                  return const CircularProgressIndicator();
-                }
-                if (state is WeatherLoaded) {
-                  return Column(                                    // 👈 only this block changed
-                    children: [
-                      _WeatherDisplay(weather: state.weather),
-                      const SizedBox(height: 24),
-                      _SearchHistory(history: state.searchHistory),
-                    ],
-                  );
-                }
-                if (state is SearchHistoryLoaded) {
-                  return _SearchHistory(history: state.history);
-                }
-                if (state is WeatherError) {
-                  return Text(
-                    state.message,
-                    style: const TextStyle(color: Colors.red),
-                  );
-                }
-                return const SizedBox();
-              },
-            ),
-          ],
+                  }
+                  if (state is SearchHistoryLoaded) {
+                    return _SearchHistory(history: state.history);
+                  }
+                  if (state is WeatherError) {
+                    return Text(
+                      state.message,
+                      style: const TextStyle(color: Colors.red),
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ) ,)
+          
+              // BLoC State Handler
+          
+            ],
+          ),
         ),
       ),
     );
@@ -145,6 +156,45 @@ class _WeatherDisplay extends StatelessWidget {
         Text(
           weather.description,
           style: const TextStyle(fontSize: 18),
+        ),
+      ],
+    );
+  }
+}
+
+// Add this new widget at the bottom of the file
+class _ForecastDisplay extends StatelessWidget {
+  final List<Forecast> forecasts;
+
+  const _ForecastDisplay({required this.forecasts});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '5 Day Forecast',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...forecasts.map(
+              (forecast) => Card(
+            child: ListTile(
+              title: Text(forecast.date),
+              subtitle: Text(forecast.description),
+              trailing: Text(
+                '${forecast.temperature}°C',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );

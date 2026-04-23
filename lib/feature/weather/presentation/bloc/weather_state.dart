@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../domain/entities/forecast.dart';
 import '../../domain/entities/weather.dart';
 
 abstract class WeatherState extends Equatable {
@@ -14,10 +15,11 @@ class WeatherLoading extends WeatherState {}
 class WeatherLoaded extends WeatherState {
   final Weather weather;
   final List<String> searchHistory;
-  WeatherLoaded(this.weather, this.searchHistory,);
+  final List<Forecast> forecast;
+  WeatherLoaded(this.weather,this.forecast, this.searchHistory,);
 
   @override
-  List<Object> get props => [weather, searchHistory];
+  List<Object> get props => [weather,forecast, searchHistory];
 }
 
 class WeatherError extends WeatherState {

@@ -5,6 +5,7 @@ import 'package:weather_app/feature/weather/data/dataSources/weather_remote_data
 
 import 'feature/weather/data/dataSources/weather_local_datasource.dart';
 import 'feature/weather/data/repositories/weather_repository_impl.dart';
+import 'feature/weather/domain/usecases/get_forecast.dart';
 import 'feature/weather/domain/usecases/get_weather.dart';
 import 'feature/weather/presentation/bloc/weather_bloc.dart';
 import 'feature/weather/presentation/bloc/weather_event.dart';
@@ -20,7 +21,8 @@ Future<void> main() async {
   final localDataSource = WeatherLocalDataSourceImpl(prefs);
   final repository = WeatherRepositoryImpl(dataSource,localDataSource);
   final getWeather = GetWeather(repository);
-  final bloc = WeatherBloc(getWeather,repository);
+  final getForecast = GetForecast(repository);
+  final bloc = WeatherBloc(getWeather,getForecast,repository);
   runApp(BlocProvider(create: (context) => bloc..add(LoadSearchHistoryEvent()), child: const MyApp()));
 }
 

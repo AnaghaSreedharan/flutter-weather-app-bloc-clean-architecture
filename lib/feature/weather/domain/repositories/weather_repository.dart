@@ -8,4 +8,9 @@ abstract class WeatherRepository {
   Future<List<Forecast>> getForecast(String cityName);
   Future<List<String>> getSearchHistory();
   Future<void> saveSearch(String cityName);
+
+  Future<Weather?> getCachedWeather(String cityName);
+  Future<void> cacheWeather(String cityName, Weather weather);
+  Future<List<Forecast>> getCachedForecast(String cityName);
+  Future<void> cacheForecast(String cityName, List<Forecast> forecasts);
 }

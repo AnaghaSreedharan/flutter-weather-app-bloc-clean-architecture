@@ -61,16 +61,31 @@ class _WeatherPageState extends State<WeatherPage> {
                     return const CircularProgressIndicator();
                   }
                   if (state is WeatherLoaded) {
-                    return Column(                                    // 👈 only this block changed
+                    return Column(
                       children: [
+                        // 👇 Show banner if data is from cache
+                        if (state.isFromCache)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            color: Colors.orange.shade100,
+                            child: const Text(
+                              '⚡ Showing cached data — updating...',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+
+                        const SizedBox(height: 16),
                         _WeatherDisplay(weather: state.weather),
                         const SizedBox(height: 24),
+
                         if (state.forecast.isNotEmpty) ...[
                           _ForecastDisplay(forecasts: state.forecast),
                           const SizedBox(height: 24),
                         ],
+
                         _SearchHistory(history: state.searchHistory),
-          
                       ],
                     );
                   }

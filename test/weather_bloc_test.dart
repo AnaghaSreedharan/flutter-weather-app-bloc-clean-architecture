@@ -16,11 +16,19 @@ class MockForecast extends Mock implements GetForecast{}
 
 class MockWeatherRepository extends Mock implements WeatherRepository {}
 
+class FakeWeather extends Fake implements Weather {}
+class FakeForecast extends Fake implements Forecast {}
+
 void main(){
   late MockWeather mockWeather;
   late MockForecast mockForecast;
   late WeatherBloc weatherBloc;
   late MockWeatherRepository mockWeatherRepository;
+
+  setUpAll(() {
+    registerFallbackValue(FakeWeather());
+    registerFallbackValue(FakeForecast());
+  });
 
   // Runs before every test
   setUp((){
@@ -28,13 +36,23 @@ void main(){
     mockForecast = MockForecast();
     mockWeatherRepository = MockWeatherRepository();
 
-
     when(() => mockWeatherRepository.getSearchHistory())
         .thenAnswer((_) async => []);
     when(() => mockWeatherRepository.saveSearch(any()))
         .thenAnswer((_) async {});
     when(() => mockForecast(any()))
         .thenAnswer((_) async => []);
+
+
+    when(() => mockWeatherRepository.getCachedWeather(any()))
+        .thenAnswer((_) async => null);
+    when(() => mockWeatherRepository.getCachedForecast(any()))
+        .thenAnswer((_) async => []);
+    when(() => mockWeatherRepository.cacheWeather(any(), any()))
+        .thenAnswer((_) async {});
+    when(() => mockWeatherRepository.cacheForecast(any(), any()))
+        .thenAnswer((_) async {});
+
 
 
     weatherBloc = WeatherBloc(mockWeather,mockForecast,mockWeatherRepository);

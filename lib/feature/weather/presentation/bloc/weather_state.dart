@@ -16,10 +16,11 @@ class WeatherLoaded extends WeatherState {
   final Weather weather;
   final List<String> searchHistory;
   final List<Forecast> forecast;
-  WeatherLoaded({required this.weather,required this.forecast, required this.searchHistory,});
+  final bool isFromCache;
+  WeatherLoaded({required this.weather,required this.forecast, required this.searchHistory,this.isFromCache = false});
 
   @override
-  List<Object> get props => [weather,forecast, searchHistory];
+  List<Object> get props => [weather,forecast, searchHistory,isFromCache];
 }
 
 class WeatherError extends WeatherState {

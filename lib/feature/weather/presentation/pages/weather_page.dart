@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../favorites/presentation/bloc/favourite_state.dart';
+import '../../../favorites/presentation/bloc/favourites_bloc.dart';
+import '../../../favorites/presentation/bloc/favourites_event.dart';
 import '../../domain/entities/forecast.dart';
 import '../../domain/entities/weather.dart';
 import '../bloc/weather_bloc.dart';
@@ -43,6 +46,11 @@ class _WeatherPageState extends State<WeatherPage> {
                       context.read<WeatherBloc>().add(
                         GetWeatherEvent(_controller.text),
                       );
+
+                      // Check if this city is favourite
+                      context.read<FavouritesBloc>().add(
+                        CheckFavouriteEvent(_controller.text),
+                      );
                     },
                     child: const Text('Search'),
                   ),
@@ -75,6 +83,29 @@ class _WeatherPageState extends State<WeatherPage> {
                               style: TextStyle(fontSize: 12),
                             ),
                           ),
+                        BlocBuilder<FavouritesBloc, FavouriteState>(builder: (context, favState) {
+                          final isFav = favState is FavouriteLoaded
+                              ? favState.isFavourite
+                              : false;
+                          return IconButton(
+                            icon: Icon(
+                              isFav ? Icons.favorite : Icons.favorite_border,
+                              color: Colors.red,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              if (isFav) {
+                                context.read<FavouritesBloc>().add(
+                                  RemoveFavouriteEvent(state.weather.cityName),
+                                );
+                              } else {
+                                context.read<FavouritesBloc>().add(
+                                  AddFavouriteEvent(state.weather.cityName),
+                                );
+                              }
+                            },
+                          );
+                        }),
 
                         const SizedBox(height: 16),
                         _WeatherDisplay(weather: state.weather),

@@ -3,6 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/feature/weather/data/dataSources/weather_remote_datasource.dart';
 
+import 'feature/favorites/data/datasources/favourites_local_datasource.dart';
+import 'feature/favorites/data/respositories/favourites_repository_impl.dart';
+import 'feature/favorites/domain/useCases/add_favourite.dart';
+import 'feature/favorites/domain/useCases/check_favourite.dart';
+import 'feature/favorites/domain/useCases/get_favourites.dart';
+import 'feature/favorites/domain/useCases/remove_favourite.dart';
+import 'feature/favorites/presentation/bloc/favourites_bloc.dart';
+import 'feature/favorites/presentation/bloc/favourites_event.dart';
+import 'feature/favorites/presentation/pages/favourites_page.dart';
 import 'feature/weather/data/dataSources/weather_local_datasource.dart';
 import 'feature/weather/data/repositories/weather_repository_impl.dart';
 import 'feature/weather/domain/usecases/get_forecast.dart';
@@ -22,8 +31,39 @@ Future<void> main() async {
   final repository = WeatherRepositoryImpl(dataSource,localDataSource);
   final getWeather = GetWeather(repository);
   final getForecast = GetForecast(repository);
-  final bloc = WeatherBloc(getWeather,getForecast,repository);
-  runApp(BlocProvider(create: (context) => bloc..add(LoadSearchHistoryEvent()), child: const MyApp()));
+
+  // Favourites feature
+  final favouritesLocalDataSource = FavouritesLocalDatasourceImpl(prefs);
+  final favouritesRepository = FavouritesRepositoryImpl(
+    favouritesLocalDataSource,
+  );
+  final getFavourites = GetFavourites(favouritesRepository);
+  final addFavourite = AddFavourite(favouritesRepository);
+  final removeFavourite = RemoveFavourite(favouritesRepository);
+  final checkFavourite = CheckFavourite(favouritesRepository);
+
+
+  runApp(  MultiBlocProvider(
+    providers: [
+      // Weather BLoC — global
+      BlocProvider(
+        create: (_) => WeatherBloc(
+          getWeather,
+          getForecast,
+          repository,
+        )..add(LoadSearchHistoryEvent()),
+      ),
+
+      // Favourites BLoC — global
+      BlocProvider(
+        create: (_) => FavouritesBloc(
+          getFavourites: getFavourites,
+          addFavourite: addFavourite,
+          removeFavourite: removeFavourite,
+          checkFavourite: checkFavourite,
+        )..add(LoadFavouritesEvent()),
+      ),
+    ], child: MyApp(),));
 }
 
 class MyApp extends StatelessWidget {
@@ -53,8 +93,47 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-        home: const WeatherPage(),
+        home: const MainScreen(),
+    );
+  }
+
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = const [
+    WeatherPage(),
+    FavouritesPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.cloud),
+            label: 'Weather',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favourites',
+          ),
+        ],
+      ),
     );
   }
 }
+
 
